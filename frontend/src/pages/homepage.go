@@ -16,6 +16,7 @@ func HomepageHandler(w http.ResponseWriter, r *http.Request) {
 		ScriptFiles: []string{
 			// "login",
 			"homepage",
+			"nav",
 			// "addScore",
 		},
 		CssFiles: []string{},
