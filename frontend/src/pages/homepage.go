@@ -21,7 +21,6 @@ func HomepageHandler(w http.ResponseWriter, r *http.Request) {
 		},
 		CssFiles: []string{},
 	}
-	// err := GetTemplates().ExecuteTemplate(w, "homepage.html", data)
 	err := GetTemplates().ExecuteTemplate(w, "homepage.html", data)
 	if err != nil {
 		log.Printf("Error when loading template:\n %s", err.Error())
