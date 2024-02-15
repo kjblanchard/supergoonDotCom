@@ -38,11 +38,8 @@ func SpaHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("TemplateFile: %s, Location: %s\n", requestBody.TemplateFile, requestBody.Location)
 	buf := &bytes.Buffer{}
 
-
-	// fmt.Fprintf(w, "Failed to load template content properly.")
 	err = GetTemplates().ExecuteTemplate(buf, fmt.Sprintf("%s.html", requestBody.TemplateFile), nil)
 	log.Printf("The return is: %s", buf.String())
-	// err = GetTemplates().ExecuteTemplate(w, fmt.Sprintf("%s.html", requestBody.TemplateFile), nil)
 	buf.WriteTo(w)
 
 	if err != nil {
