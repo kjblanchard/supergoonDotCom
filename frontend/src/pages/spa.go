@@ -1,7 +1,6 @@
 package pages
 
 import (
-	// "bytes"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -10,17 +9,17 @@ import (
 	"net/http"
 )
 
+var (
+	debug bool = false
+)
+
 type spaRequestBody struct {
 	TemplateFile string `json:"TemplateFile"`
-	Location     string `json:"Location"`
 }
 
 func SpaHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Just started spa handler")
-
 	body := r.Body
 	defer body.Close()
-
 	bodyRead, err := io.ReadAll(body)
 	if err != nil {
 		log.Printf("Error reading request body: %s", err.Error())
@@ -35,15 +34,27 @@ func SpaHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Printf("TemplateFile: %s, Location: %s\n", requestBody.TemplateFile, requestBody.Location)
+	if debug {
+		debugRequest(&w, r, &requestBody)
+	} else {
+		request(&w, r, &requestBody)
+	}
+
+}
+
+func debugRequest(w *http.ResponseWriter, r *http.Request, requestBody *spaRequestBody) {
 	buf := &bytes.Buffer{}
-
-	err = GetTemplates().ExecuteTemplate(buf, fmt.Sprintf("%s.html", requestBody.TemplateFile), nil)
-	log.Printf("The return is: %s", buf.String())
-	buf.WriteTo(w)
-
+	err := GetTemplates().ExecuteTemplate(buf, fmt.Sprintf("%s.html", requestBody.TemplateFile), nil)
 	if err != nil {
-		log.Printf("Error when loading template from SPA:\n %s", err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(*w, "Internal Server Error", http.StatusInternalServerError)
+	}
+	log.Printf("The return is: %s", buf.String())
+	buf.WriteTo(*w)
+}
+
+func request(w *http.ResponseWriter, r *http.Request, requestBody *spaRequestBody) {
+	err := GetTemplates().ExecuteTemplate(*w, fmt.Sprintf("%s.html", requestBody.TemplateFile), nil)
+	if err != nil {
+		http.Error(*w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }

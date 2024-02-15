@@ -14,14 +14,13 @@ type homepageTemplateData struct {
 func HomepageHandler(w http.ResponseWriter, r *http.Request) {
 	data := homepageTemplateData{
 		ScriptFiles: []string{
-			// "login",
-			"homepage",
 			"nav",
-			// "addScore",
+			"homepage",
 		},
-		CssFiles: []string{},
+		CssFiles: []string{
+			"styles",
+		},
 	}
-	// err := GetTemplates().ExecuteTemplate(w, "main/homepage.html", data)
 	err := GetTemplates().ExecuteTemplate(w, "homepage.html", data)
 	if err != nil {
 		log.Printf("Error when loading template:\n %s", err.Error())
