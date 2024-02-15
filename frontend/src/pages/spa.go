@@ -1,6 +1,8 @@
 package pages
 
 import (
+	// "bytes"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,6 +16,7 @@ type spaRequestBody struct {
 }
 
 func SpaHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Just started spa handler")
 
 	body := r.Body
 	defer body.Close()
@@ -31,13 +34,19 @@ func SpaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
-
-	// Now, requestBody contains the decoded JSON data
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Printf("TemplateFile: %s, Location: %s\n", requestBody.TemplateFile, requestBody.Location)
+	buf := &bytes.Buffer{}
 
-	// Handle the rest of your logic here...
 
-	// Respond with success or appropriate response
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Request processed successfully"))
+	// fmt.Fprintf(w, "Failed to load template content properly.")
+	err = GetTemplates().ExecuteTemplate(buf, fmt.Sprintf("%s.html", requestBody.TemplateFile), nil)
+	log.Printf("The return is: %s", buf.String())
+	// err = GetTemplates().ExecuteTemplate(w, fmt.Sprintf("%s.html", requestBody.TemplateFile), nil)
+	buf.WriteTo(w)
+
+	if err != nil {
+		log.Printf("Error when loading template from SPA:\n %s", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
